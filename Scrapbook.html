@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anime Birthday Scrapbook</title>
+  <style>
+    body {
+      margin: 0;
+      background: #f8f0e3;
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+    .book {
+      width: 700px;
+      height: 450px;
+      perspective: 2000px;
+      position: relative;
+      transition: filter 0.5s ease;
+      z-index: 1;
+    }
+    .page {
+      width: 100%;
+      height: 100%;
+      background: white;
+      position: absolute;
+      top: 0;
+      left: 0;
+      transform-origin: left;
+      transition: transform 1s ease, opacity 0.5s ease;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+      padding: 30px;
+      box-sizing: border-box;
+      backface-visibility: hidden;
+      opacity: 0;
+    }
+    .page.flipped { transform: rotateY(-180deg); opacity: 0; }
+    .page.active { opacity: 1; }
+    .page img {
+      max-width: 100%;
+      max-height: 250px;
+      display: block;
+      margin: 20px auto;
+      border-radius: 10px;
+    }
+    .envelope-container {
+      position: relative;
+      width: 300px;
+      height: 200px;
+      perspective: 1000px;
+      cursor: pointer;
+      margin: 0 auto;
+      top: 60px;
+    }
+    .envelope {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      background: #ff2400;
+      border-radius: 8px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      transition: transform 0.8s ease;
+      transform-style: preserve-3d;
+    }
+    .envelope.open { transform: rotateX(-180deg); }
+    .flap {
+      width: 100%;
+      height: 50%;
+      background: #cc1c00;
+      position: absolute;
+      top: 0;
+      clip-path: polygon(0 0, 100% 0, 50% 100%);
+      transition: transform 0.8s ease;
+      transform-origin: top;
+    }
+    .envelope.open .flap { transform: rotateX(-180deg); }
+    .letter {
+      position: absolute;
+      bottom: -220px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 260px;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+      opacity: 0;
+      transition: all 0.8s ease;
+      text-align: center;
+      pointer-events: none;
+      color: #333;
+    }
+    .letter h1 {
+      margin-bottom: 10px;
+      font-size: 20px;
+      color: #ff2400;
+    }
+    .letter.fullscreen {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.8);
+      width: 80%;
+      max-width: 500px;
+      z-index: 1000;
+      pointer-events: auto;
+      animation: zoomIn 0.4s ease forwards, glow 1.5s ease-in-out infinite alternate;
+      filter: none !important;
+      background: white;
+      color: #333;
+    }
+    @keyframes zoomIn {
+      0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+      100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    }
+    @keyframes glow {
+      0% { box-shadow: 0 0 15px 3px rgba(255, 36, 0, 0.4); }
+      100% { box-shadow: 0 0 30px 8px rgba(255, 36, 0, 0.8); }
+    }
+    .controls {
+      position: absolute;
+      bottom: -60px;
+      width: 100%;
+      text-align: center;
+      z-index: 500;
+    }
+    button {
+      margin: 0 10px;
+      padding: 10px 20px;
+      background: #ff758c;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      cursor: pointer;
+      font-size: 16px;
+      position: relative;
+      z-index: 501;
+    }
+    #confetti {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 100;
+    }
+    #muteBtn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #ff758c;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 8px 16px;
+      cursor: pointer;
+      z-index: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="book">
+    <div class="page active">
+      <h2>The Day We Met ✨</h2>
+      <p>Ever since that day, my heart has belonged to you.
+         the first time u called me cute and I blushed like a tomato.
+         I knew you were special.</p>      
+      <img src="assets/images/memory1.jpg" alt="Memory 1">
+    </div>
+    <div class="page">
+      <h2>When I Knew You Were the One ❤️</h2>
+      <p>The moment you said "I love you," I felt like I was floating among the stars.
+         Ahh that night when we confessed our feelings under the stars,
+         I knew you were the one I wanted to spend my life with.
+         my hurt was beating so fast, I thought it would burst out of my chest.
+         for the first time, I felt like I was in an anime, where everything was magical.
+         I still can't forget that day.
+      </p>
+      <img src="assets/images/memory2.jpg" alt="Memory 2">
+    </div>
+    <div class="page">
+      <h2>Our Late Night Talks 🌙</h2>
+      <p>Even when the world sleeps, your messages light up my night.
+          Those late-night talks where we shared our dreams and fears,
+          made me realize how lucky I am to have you in my life.
+          I cherish every moment we spend together, even if it's just through a screen.
+          Your words are like a warm hug that comforts me in the darkest of nights.          
+      </p>
+      <img src="assets/images/memory3.jpg" alt="Memory 3">
+    </div>
+    <div class="page">
+      <h2>Our World, You're My Favorite Character 🎁</h2>
+      <p>If our life was an anime, you’d be the main character and I’d be the lucky sidekick who got your heart.
+          You bring color to my world, and every day with you feels like a new episode of our love story.
+          I can't wait to create more beautiful memories with you, my favorite character.
+          You make my life feel like a never-ending adventure, and I wouldn't trade it for anything in the world.
+      </p>
+      <img src="assets/images/memory4.jpg" alt="Memory 4">
+    </div>
+
+    <!-- New anime pages -->
+    <div class="page">
+      <h2>Our Anime Memory 🌸</h2>
+      <p>Holding hands under cherry blossoms — just like in our favorite anime.
+          Every moment with you feels like a scene from a beautiful anime,
+          where we are the main characters, creating our own love story.
+          I cherish every second we spend together, and I can't wait to create more magical moments with you.
+          You make my life feel like a never-ending anime, full of love and adventure.
+      </p>
+      <img src="assets/images/couple_cherry_blossom.png" alt="Cherry Blossom Memory">
+    </div>
+    <div class="page">
+      <h2>Sweet Moments 🍨</h2>
+      <p>Sharing ice cream at a cozy café, captured in anime magic.
+          I want to meet you soon and enjoy ice cream together with u,
+          it remind me of the simple joys in life that make our love story so special.
+          I love how we can turn even the simplest moments into something magical,
+          just like in our favorite anime scenes.          
+      </p>
+      <img src="assets/images/couple_icecream_cafe.png" alt="Ice Cream Memory">
+    </div>
+    <div class="page">
+      <h2>City Adventures ✨</h2>
+      <p>Taking selfies under neon lights — our story in vibrant colors.
+         I so wanna go on adventures with you, exploring the city and capturing our moments together.
+         Every selfie we take is like a snapshot of our love story, filled with laughter and joy
+      </p>
+      <img src="assets/images/couple_selfie_city.png" alt="City Selfie Memory">
+    </div>
+
+    <!-- Letter page -->
+    <div class="page">
+      <h2>Open Your Letter 💌</h2>
+      <div class="envelope-container" onclick="openEnvelope()">
+        <div class="envelope" id="envelope">
+          <div class="flap"></div>
+        </div>
+        <div class="letter" id="letter">
+          <h1>Happy Birthday My Love ❤️</h1>
+          <p id="letterText"></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button onclick="prevPage()">← Back</button>
+      <button onclick="nextPage()">Next →</button>
+    </div>
+  </div>
+
+  <canvas id="confetti"></canvas>
+  <audio id="bgMusic" src="assets/music/love-song.mp3" loop></audio>
+  <button id="muteBtn">🔊 Mute</button>
+
+  <script>
+    let currentPage = 0;
+    const pages = document.querySelectorAll('.page');
+
+    function showPage(index) {
+      pages.forEach((page, i) => {
+        page.classList.toggle('active', i === index);
+        page.classList.toggle('flipped', i < index);
+      });
+    }
+    function nextPage() { if (currentPage < pages.length - 1) { currentPage++; showPage(currentPage); resetEnvelope(); } }
+    function prevPage() { if (currentPage > 0) { currentPage--; showPage(currentPage); resetEnvelope(); } }
+    function resetEnvelope() {
+      document.getElementById('envelope').classList.remove('open');
+      document.getElementById('letter').classList.remove('fullscreen');
+      document.getElementById('bgMusic').pause();
+      document.getElementById('bgMusic').currentTime = 0;
+    }
+    function openEnvelope() {
+      if (currentPage === pages.length - 1) {
+        const envelope = document.getElementById('envelope');
+        const letter = document.getElementById('letter');
+        const bgMusic = document.getElementById('bgMusic');
+        envelope.classList.toggle('open');
+        if (envelope.classList.contains('open')) {
+          letter.classList.add('fullscreen');
+          typeWriterEffect("Even though we’re far apart, you’re always close to my heart.\nThis letter carries all my love and endless wishes for your happiness. I hope i can remain your prince charming in the future also and i am going to make every wish of your come true thaks for loving me so much my love you always make all my worries fly away you are always there when i need u most so,THANKU\nFOREVER YOURS.", "letterText");
+          setTimeout(() => { launchConfetti(); }, 400);
+          bgMusic.play();
+        } else { letter.classList.remove('fullscreen'); bgMusic.pause(); bgMusic.currentTime = 0; }
+      }
+    }
+    document.addEventListener('click', (e) => {
+      const letter = document.getElementById('letter');
+      const envelope = document.getElementById('envelope');
+      if (letter.classList.contains('fullscreen') && !letter.contains(e.target) && !envelope.contains(e.target)) {
+        letter.classList.remove('fullscreen');
+        envelope.classList.remove('open');
+        const bgMusic = document.getElementById('bgMusic');
+        bgMusic.pause();
+        bgMusic.currentTime = 0;
+      }
+    });
+    function typeWriterEffect(text, elementId) {
+      const element = document.getElementById(elementId);
+      element.textContent = "";
+      let i = 0;
+      function typing() {
+        if (i < text.length) { element.textContent += text.charAt(i); i++; setTimeout(typing, 50); }
+      }
+      typing();
+    }
+    function launchConfetti() {
+      const duration = 3 * 1000;
+      const colors = ['#ff2400', '#ff6347', '#ffd700', '#ff69b4'];
+      const canvas = document.getElementById('confetti');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      const pieces = Array.from({ length: 150 }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height - canvas.height,
+        r: Math.random() * 6 + 4,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        tilt: Math.random() * 10 - 10
+      }));
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        pieces.forEach(p => { ctx.fillStyle = p.color; ctx.fillRect(p.x, p.y, p.r, p.r); });
+        pieces.forEach(p => { p.y += 3; p.x += Math.sin(p.tilt) * 2; });
+      }
+      const interval = setInterval(draw, 20);
+      setTimeout(() => { clearInterval(interval); ctx.clearRect(0, 0, canvas.width, canvas.height); }, duration);
+    }
+    document.getElementById('muteBtn').addEventListener('click', () => {
+      const bgMusic = document.getElementById('bgMusic');
+      bgMusic.muted = !bgMusic.muted;
+      document.getElementById('muteBtn').textContent = bgMusic.muted ? '🔇 Unmute' : '🔊 Mute';
+    });
+  </script>
+</body>
+</html>

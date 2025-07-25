@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Magical Birthday Cake</title>
+  <style>
+    * {margin:0;padding:0;box-sizing:border-box;font-family:"Arial Rounded MT Bold",Arial,sans-serif;}
+    body {
+      background: linear-gradient(135deg, #ffcce6, #c4e0ff);
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; overflow: hidden;
+    }
+    .balloon {position: absolute;width: 40px;height: 50px;border-radius: 50%;animation: float 15s infinite ease-in-out;z-index: 1;}
+    @keyframes float {0%{transform:translateY(100vh);opacity:1;}100%{transform:translateY(-100px) translateX(50px);opacity:0;}}
+    .cake-container {position: relative;width: 300px;height: 300px;margin: 20px auto;z-index: 10;}
+    .cake {position: absolute;bottom: 0;left: 50%;transform: translateX(-50%);width: 200px;height: 120px;background: linear-gradient(to right, #ff85a2, #ff99b6);border-radius: 10px 10px 0 0;box-shadow: 0 5px 15px rgba(0,0,0,0.2);}
+    .cake:before {content:"";position:absolute;top:-40px;left:0;width:100%;height:40px;background:linear-gradient(to right,#fc6c85,#ff85a2);border-radius:10px 10px 0 0;}
+    .cake:after {content:"";position:absolute;top:-70px;left:10%;width:80%;height:30px;background:linear-gradient(to right,#ffb3c6,#ffcce6);border-radius:10px 10px 0 0;}
+    .frosting {position:absolute;top:-75px;left:15%;width:70%;height:5px;background:#fff;border-radius:5px;box-shadow:0 0 5px #ffcce6;}
+    .decoration {position:absolute;width:10px;height:10px;border-radius:50%;background:#ff3366;box-shadow:0 0 5px #ff99b6;}
+    .candle-container {position:absolute;top:-95px;left:0;width:100%;display:flex;justify-content:center;gap:20px;}
+    .candle {position:relative;width:8px;height:30px;background:linear-gradient(to top,#ffff99,#ff9933);border-radius:4px;cursor:pointer;}
+    .flame {position:absolute;top:-20px;left:50%;transform:translateX(-50%);width:12px;height:20px;background:radial-gradient(ellipse at center,#ffff00,#ff9900,#ff6600);border-radius:50% 50% 20% 20%;box-shadow:0 0 10px #ff9900,0 0 20px #ffff00;animation:flicker 0.5s infinite alternate;}
+    @keyframes flicker {0%{transform:translateX(-50%) scale(1);opacity:1;}100%{transform:translateX(-50%) scale(1.1);opacity:0.9;}}
+    .candle.blown .flame {opacity:0;animation:none;transition:opacity 0.3s ease-out;}
+    .smoke {position:absolute;top:-25px;left:50%;transform:translateX(-50%);width:8px;height:0;background:rgba(200,200,200,0.5);border-radius:10px;opacity:0;}
+    .candle.blown .smoke {height:30px;opacity:0.7;animation:smokeRise 2s forwards;}
+    @keyframes smokeRise {0%{height:0;opacity:0;}20%{height:10px;opacity:0.7;}100%{height:30px;opacity:0;transform:translateY(-30px) scale(1.5);}}
+    .wish-message {
+      position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0);
+      background: rgba(255,255,255,0.95); padding: 25px; border-radius: 20px; text-align: center;
+      box-shadow: 0 10px 30px rgba(255,105,180,0.8), 0 0 20px rgba(255,255,255,0.8);
+      opacity: 0; transition: all 0.5s ease; max-width: 400px; z-index: 100;
+    }
+    .wish-message.show { transform: translate(-50%, -50%) scale(1); opacity: 1; animation: bounceIn 0.8s; }
+    @keyframes bounceIn {0%{transform:scale(0);opacity:0;}60%{transform:scale(1.1);opacity:1;}100%{transform:scale(1);}}
+    .nav-buttons {position:fixed;bottom:30px;left:0;width:100%;display:flex;justify-content:space-between;padding:0 50px;}
+    .btn {padding:12px 24px;background:linear-gradient(to right,#ff85a2,#ff3366);color:white;border:none;border-radius:30px;cursor:pointer;font-size:16px;font-weight:600;}
+    /* Confetti pieces for explosion */
+    .confetti-piece {
+      position: fixed; width: 10px; height: 10px; background: red;
+      animation: confettiExplode linear forwards; pointer-events: none; z-index: 200;
+    }
+    @keyframes confettiExplode {
+      0% {transform: translate(0,0) rotate(0deg); opacity:1;}
+      100% {transform: translate(var(--x), var(--y)) rotate(720deg); opacity:0;}
+    }
+  </style>
+</head>
+<body>
+  <div class="cake-container">
+    <div class="cake">
+      <div class="candle-container" id="candleContainer"></div>
+      <div class="frosting"></div>
+    </div>
+  </div>
+
+  <div class="wish-message" id="wishMessage">
+    <h2>✨ Happy Birthday! ✨</h2>
+    <p>Make a wish, Bestie! May all your dreams come true! 🎂✨</p>
+    <button class="btn" onclick="closeWishMessage()">Thank you! ❤️</button>
+  </div>
+
+  <div class="nav-buttons">
+    <button class="btn" onclick="goBack()">◀ Back to Memory Lane</button>
+    <button class="btn" onclick="goNext()">Next Surprise ▶</button>
+  </div>
+
+  <script>
+    let candlesBlown = 0, totalCandles = 5, allCandlesBlown = false;
+    document.addEventListener("DOMContentLoaded", () => {
+      createCandles(); createBalloons(); createDecorations();
+      document.querySelectorAll(".candle").forEach(c => c.addEventListener("click", blowOutCandle));
+    });
+    function createCandles() {
+      const container = document.getElementById("candleContainer");
+      for (let i = 0; i < totalCandles; i++) {
+        const candle = document.createElement("div"); candle.className = "candle";
+        candle.innerHTML = '<div class="flame"></div><div class="smoke"></div>'; container.appendChild(candle);
+      }
+    }
+    function createBalloons() {
+      const colors = ["#ff66b3", "#66ccff", "#ff9966", "#99ff66", "#cc99ff"];
+      for (let i = 0; i < 15; i++) {
+        const b = document.createElement("div");
+        b.className = "balloon"; b.style.background = colors[Math.floor(Math.random()*colors.length)];
+        b.style.left = Math.random()*100 + "%"; document.body.appendChild(b);
+      }
+    }
+    function createDecorations() {
+      const cake = document.querySelector(".cake"), colors = ["#ff3366", "#ffcc00", "#66ccff", "#ff9966", "#99ff66"];
+      for (let i = 0; i < 10; i++) {
+        const d = document.createElement("div");
+        d.className = "decoration"; d.style.background = colors[Math.floor(Math.random()*colors.length)];
+        d.style.top = -20 - Math.random()*50 + "px"; d.style.left = Math.random()*100 + "%"; cake.appendChild(d);
+      }
+    }
+    function blowOutCandle() {
+      if (!this.classList.contains("blown")) {
+        this.classList.add("blown"); candlesBlown++;
+        if (candlesBlown === totalCandles && !allCandlesBlown) {
+          allCandlesBlown = true; setTimeout(() => { showWishMessage(); startConfettiExplosion(); }, 1000);
+        }
+      }
+    }
+    function showWishMessage() { document.getElementById("wishMessage").classList.add("show"); }
+    function closeWishMessage() { document.getElementById("wishMessage").classList.remove("show"); }
+    function goBack() { window.location.href = "cover.html"; }
+    function goNext() { window.location.href = "scrapbook.html"; }
+
+    function startConfettiExplosion() {
+      const colors = ["#ff3366", "#ffcc00", "#66ccff", "#ff9966", "#99ff66", "#ffffff"];
+      const duration = 10000; // 10 seconds
+      const endTime = Date.now() + duration;
+
+      function createConfettiPiece() {
+        const confetti = document.createElement("div");
+        confetti.className = "confetti-piece";
+        confetti.style.background = colors[Math.floor(Math.random()*colors.length)];
+        confetti.style.left = Math.random()*100 + "vw";
+        confetti.style.top = Math.random()*20 + "vh";
+        confetti.style.setProperty("--x", (Math.random() * 200 - 100) + "vw");
+        confetti.style.setProperty("--y", (Math.random() * 200 + 100) + "vh");
+        confetti.style.animationDuration = (2 + Math.random()*3) + "s";
+        document.body.appendChild(confetti);
+        setTimeout(() => confetti.remove(), 3000);
+      }
+
+      (function loop() {
+        createConfettiPiece();
+        if (Date.now() < endTime) requestAnimationFrame(loop);
+      })();
+    }
+  </script>
+</body>
+</html>
